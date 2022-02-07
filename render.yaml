@@ -22,13 +22,13 @@ services:
         value: frontend,matching,history,worker
       - key: DYNAMIC_CONFIG_FILE_PATH
         value: /etc/temporal/dynamicconfig.yaml
-      - key: SKIP_POSTGRES_DB_CREATION
-        value: true
       - key: TEMPORAL_CLI_ADDRESS
         fromService:
           name: temporal-all
           type: web
           property: hostport
+      - key: SKIP_POSTGRES_DB_CREATION
+        value: true
       - key: DB
         value: postgresql
       - key: DBNAME

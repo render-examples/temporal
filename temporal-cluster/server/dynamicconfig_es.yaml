@@ -23,5 +23,8 @@ history.defaultWorkflowRetryPolicy:
     BackoffCoefficient: 2.0
     MaximumAttempts: 0
 system.advancedVisibilityWritingMode:
-  - value: "off"
+  - value: "on"
+    constraints: {}
+system.enableReadVisibilityFromES:
+  - value: true
     constraints: {}

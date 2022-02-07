@@ -15,7 +15,11 @@ This repo defines a [Render Blueprint](https://render.com/docs/blueprint-spec) w
     - `/trigger-workflow` for kicking off the `TransferMoney` workflow.
   - `app-worker` executes any triggered workflows.
 
-For a more production-ready setup, use the Blueprint defined in [render.with_scaling.yaml](render.with_scaling.yaml) rather than the one in [render.yaml](render.yaml). In this Blueprint, each of the four Temporal services are run as its own Render service that can be scaled independently.It also comes with an ElasticSearch instance configured. In your fork, run
+For a more production-ready setup, use the Blueprint defined in [render.with_scaling.yaml](render.with_scaling.yaml) rather than the one in [render.yaml](render.yaml). The main differences are:
+- Each of the four Temporal services is run as its own Render service that can be scaled independently.
+- Integrates ElasticSearch, to enable Temporal's [advanced visibility](https://docs.temporal.io/docs/content/what-is-advanced-visibility/).
+
+To use this in your fork, run
 ```bash
 $ mv render.with_scaling.yaml render.yaml
 ```
@@ -27,7 +31,8 @@ scaling:
   targetMemoryPercent: 80
   targetCPUPercent: 80
 ```
-# Steps
+
+# Deploy Steps
 
 1. Click the "Deploy to Render" button.
 2. In your Render dashboard, click on the service `app-workflow-trigger`, and copy its URL. Let's say it's `https://app-workflow-trigger.onrender.com/`.
@@ -92,6 +97,6 @@ scaling:
 7. To check that the workflow has been run successfully, click on the `temporal-web` service, and go to its URL. Under the `default` namespace, you should find your workflow's run with the status "Completed".
 
 
-# Disclaimer
+# Acknowledgements
 
 [auto-setup-override.sh](temporal-cluster/server/auto-setup/auto-setup-override.sh) is based on Temporal's [auto-setup.sh script](https://github.com/temporalio/temporal/blob/077d39c775/docker/auto-setup.sh), with some modifications made to better accommodate Render's architecture.
