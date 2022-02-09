@@ -1,0 +1,111 @@
+databases:
+  - name: temporal-db
+    databaseName: temporal
+    user: temporal
+    plan: standard
+  - name: temporal-db-visibility
+    databaseName: visibility
+    user: visibility
+    plan: standard
+
+services:
+  - type: web
+    name: temporal-all
+    autoDeploy: false
+    plan: Standard
+    env: docker
+    dockerfilePath: ./temporal-cluster/server/auto-setup/Dockerfile
+    envVars:
+      - key: FRONTEND_GRPC_PORT
+        value: 10000
+      - key: SERVICES
+        value: frontend,matching,history,worker
+      - key: DYNAMIC_CONFIG_FILE_PATH
+        value: /etc/temporal/dynamicconfig.yaml
+      - key: TEMPORAL_CLI_ADDRESS
+        fromService:
+          name: temporal-all
+          type: web
+          property: hostport
+      - key: SKIP_POSTGRES_DB_CREATION
+        value: true
+      - key: DB
+        value: postgresql
+      - key: DBNAME
+        fromDatabase:
+          name: temporal-db
+          property: database
+      - key: DB_PORT
+        fromDatabase:
+          name: temporal-db
+          property: port
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: temporal-db
+          property: user
+      - key: POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db
+          property: password
+      - key: POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db
+          property: host
+      - key: VISIBILITY_DBNAME
+        fromDatabase:
+          name: temporal-db-visibility
+          property: database
+      - key: VISIBILITY_DB_PORT
+        fromDatabase:
+          name: temporal-db-visibility
+          property: port
+      - key: VISIBILITY_POSTGRES_USER
+        fromDatabase:
+          name: temporal-db-visibility
+          property: user
+      - key: VISIBILITY_POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db-visibility
+          property: password
+      - key: VISIBILITY_POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db-visibility
+          property: host
+  - type: web
+    name: temporal-ui
+    autoDeploy: false
+    plan: Standard
+    env: docker
+    dockerfilePath: ./temporal-cluster/web/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8088
+      - key: TEMPORAL_PERMIT_WRITE_API
+        value: true
+      - key: TEMPORAL_GRPC_ENDPOINT
+        fromService:
+          name: temporal-all
+          type: web
+          property: hostport
+  - type: web
+    name: app-workflow-trigger
+    env: go
+    buildCommand: go build start/main.go
+    startCommand: ./main
+    envVars:
+      - key: TEMPORAL_CLUSTER_HOSTPORT
+        fromService:
+          name: temporal-all
+          type: web
+          property: hostport
+  - type: worker
+    name: app-worker
+    env: go
+    buildCommand: go build worker/main.go
+    startCommand: ./main
+    envVars:
+      - key: TEMPORAL_CLUSTER_HOSTPORT
+        fromService:
+          name: temporal-all
+          type: web
+          property: hostport

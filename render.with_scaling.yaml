@@ -1,0 +1,385 @@
+databases:
+  - name: temporal-db
+    databaseName: temporal
+    user: temporal
+    plan: standard
+  - name: temporal-db-visibility
+    databaseName: visibility
+    user: visibility
+    plan: standard
+
+services:
+  - type: pserv
+    name: temporal-elasticsearch
+    autoDeploy: false
+    plan: Standard
+    env: docker
+    dockerfilePath: ./temporal-cluster/elasticsearch/Dockerfile
+    envVars:
+      - key: PORT
+        value: 9200
+      - key: ES_JAVA_OPTS
+        value: "-Xms100m -Xmx100m"
+      - key: xpack.security.enabled
+        value: true
+      - key: ELASTIC_PASSWORD
+        generateValue: true
+      - key: cluster.routing.allocation.disk.threshold_enabled
+        value: true
+      - key: cluster.routing.allocation.disk.watermark.low
+        value: 512mb
+      - key: cluster.routing.allocation.disk.watermark.high
+        value: 256mb
+      - key: cluster.routing.allocation.disk.watermark.flood_stage
+        value: 128mb
+      - key: discovery.type
+        value: single-node
+  - type: web
+    name: temporal-frontend
+    autoDeploy: false
+    plan: Standard
+    env: docker
+    dockerfilePath: ./temporal-cluster/server/auto-setup/Dockerfile
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+      targetMemoryPercent: 80
+      targetCPUPercent: 80
+    envVars:
+      - key: FRONTEND_GRPC_PORT
+        value: 10000
+      - key: SERVICES
+        value: frontend
+      - key: DYNAMIC_CONFIG_FILE_PATH
+        # value: /etc/temporal/dynamicconfig.yaml
+        value: /etc/temporal/dynamicconfig_es.yaml # Use this if deploying with ElasticSearch
+      - key: TEMPORAL_CLI_ADDRESS
+        fromService:
+          name: temporal-frontend
+          type: web
+          property: hostport
+      - key: ENABLE_ES
+        value: true
+      - key: ES_VERSION
+        value: v7
+      - key: ES_SEEDS
+        fromService:
+          name: temporal-elasticsearch
+          type: pserv
+          property: host
+      - key: ES_USER
+        value: elastic
+      - key: ES_PWD
+        fromService:
+          name: temporal-elasticsearch
+          type: pserv
+          envVarKey: ELASTIC_PASSWORD
+      - key: SKIP_POSTGRES_DB_CREATION
+        value: true
+      - key: DB
+        value: postgresql
+      - key: DBNAME
+        fromDatabase:
+          name: temporal-db
+          property: database
+      - key: DB_PORT
+        fromDatabase:
+          name: temporal-db
+          property: port
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: temporal-db
+          property: user
+      - key: POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db
+          property: password
+      - key: POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db
+          property: host
+      - key: VISIBILITY_DBNAME
+        fromDatabase:
+          name: temporal-db-visibility
+          property: database
+      - key: VISIBILITY_DB_PORT
+        fromDatabase:
+          name: temporal-db-visibility
+          property: port
+      - key: VISIBILITY_POSTGRES_USER
+        fromDatabase:
+          name: temporal-db-visibility
+          property: user
+      - key: VISIBILITY_POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db-visibility
+          property: password
+      - key: VISIBILITY_POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db-visibility
+          property: host
+  - type: pserv
+    name: temporal-history
+    autoDeploy: false
+    plan: Standard
+    env: docker
+    dockerfilePath: ./temporal-cluster/server/Dockerfile
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+      targetMemoryPercent: 80
+      targetCPUPercent: 80
+    envVars:
+      - key: SERVICES
+        value: history
+      - key: PUBLIC_FRONTEND_ADDRESS
+        fromService:
+          name: temporal-frontend
+          type: web
+          property: hostport
+      - key: DYNAMIC_CONFIG_FILE_PATH
+        # value: /etc/temporal/dynamicconfig.yaml
+        value: /etc/temporal/dynamicconfig_es.yaml # Use this if deploying with ElasticSearch
+      - key: ENABLE_ES
+        value: true
+      - key: ES_VERSION
+        value: v7
+      - key: ES_SEEDS
+        fromService:
+          name: temporal-elasticsearch
+          type: pserv
+          property: host
+      - key: ES_USER
+        value: elastic
+      - key: ES_PWD
+        fromService:
+          name: temporal-elasticsearch
+          type: pserv
+          envVarKey: ELASTIC_PASSWORD
+      - key: DB
+        value: postgresql
+      - key: DBNAME
+        fromDatabase:
+          name: temporal-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: temporal-db
+          property: user
+      - key: POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db
+          property: password
+      - key: POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db
+          property: host
+      - key: VISIBILITY_DBNAME
+        fromDatabase:
+          name: temporal-db-visibility
+          property: database
+      - key: VISIBILITY_DB_PORT
+        fromDatabase:
+          name: temporal-db-visibility
+          property: port
+      - key: VISIBILITY_POSTGRES_USER
+        fromDatabase:
+          name: temporal-db-visibility
+          property: user
+      - key: VISIBILITY_POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db-visibility
+          property: password
+      - key: VISIBILITY_POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db-visibility
+          property: host
+  - type: pserv
+    name: temporal-matching
+    autoDeploy: false
+    plan: Standard
+    env: docker
+    dockerfilePath: ./temporal-cluster/server/Dockerfile
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+      targetMemoryPercent: 80
+      targetCPUPercent: 80
+    envVars:
+      - key: SERVICES
+        value: matching
+      - key: PUBLIC_FRONTEND_ADDRESS
+        fromService:
+          name: temporal-frontend
+          type: web
+          property: hostport
+      - key: DYNAMIC_CONFIG_FILE_PATH
+        # value: /etc/temporal/dynamicconfig.yaml
+        value: /etc/temporal/dynamicconfig_es.yaml # Use this if deploying with ElasticSearch
+      - key: ENABLE_ES
+        value: true
+      - key: ES_VERSION
+        value: v7
+      - key: ES_SEEDS
+        fromService:
+          name: temporal-elasticsearch
+          type: pserv
+          property: host
+      - key: ES_USER
+        value: elastic
+      - key: ES_PWD
+        fromService:
+          name: temporal-elasticsearch
+          type: pserv
+          envVarKey: ELASTIC_PASSWORD
+      - key: DB
+        value: postgresql
+      - key: DBNAME
+        fromDatabase:
+          name: temporal-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: temporal-db
+          property: user
+      - key: POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db
+          property: password
+      - key: POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db
+          property: host
+      - key: VISIBILITY_DBNAME
+        fromDatabase:
+          name: temporal-db-visibility
+          property: database
+      - key: VISIBILITY_DB_PORT
+        fromDatabase:
+          name: temporal-db-visibility
+          property: port
+      - key: VISIBILITY_POSTGRES_USER
+        fromDatabase:
+          name: temporal-db-visibility
+          property: user
+      - key: VISIBILITY_POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db-visibility
+          property: password
+      - key: VISIBILITY_POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db-visibility
+          property: host
+  - type: pserv
+    autoDeploy: false
+    name: temporal-worker
+    env: docker
+    dockerfilePath: ./temporal-cluster/server/Dockerfile
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+      targetMemoryPercent: 80
+      targetCPUPercent: 80
+    envVars:
+      - key: SERVICES
+        value: worker
+      - key: PUBLIC_FRONTEND_ADDRESS
+        fromService:
+          name: temporal-frontend
+          type: web
+          property: hostport
+      - key: DYNAMIC_CONFIG_FILE_PATH
+        # value: /etc/temporal/dynamicconfig.yaml
+        value: /etc/temporal/dynamicconfig_es.yaml # Use this if deploying with ElasticSearch
+      - key: ENABLE_ES
+        value: true
+      - key: ES_VERSION
+        value: v7
+      - key: ES_SEEDS
+        fromService:
+          name: temporal-elasticsearch
+          type: pserv
+          property: host
+      - key: ES_USER
+        value: elastic
+      - key: ES_PWD
+        fromService:
+          name: temporal-elasticsearch
+          type: pserv
+          envVarKey: ELASTIC_PASSWORD
+      - key: DB
+        value: postgresql
+      - key: DBNAME
+        fromDatabase:
+          name: temporal-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: temporal-db
+          property: user
+      - key: POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db
+          property: password
+      - key: POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db
+          property: host
+      - key: VISIBILITY_DBNAME
+        fromDatabase:
+          name: temporal-db-visibility
+          property: database
+      - key: VISIBILITY_DB_PORT
+        fromDatabase:
+          name: temporal-db-visibility
+          property: port
+      - key: VISIBILITY_POSTGRES_USER
+        fromDatabase:
+          name: temporal-db-visibility
+          property: user
+      - key: VISIBILITY_POSTGRES_PWD
+        fromDatabase:
+          name: temporal-db-visibility
+          property: password
+      - key: VISIBILITY_POSTGRES_SEEDS
+        fromDatabase:
+          name: temporal-db-visibility
+          property: host
+  - type: web
+    name: temporal-ui
+    autoDeploy: false
+    plan: Standard
+    env: docker
+    dockerfilePath: ./temporal-cluster/web/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8088
+      - key: TEMPORAL_PERMIT_WRITE_API
+        value: true
+      - key: TEMPORAL_GRPC_ENDPOINT
+        fromService:
+          name: temporal-frontend
+          type: web
+          property: hostport
+  - type: web
+    name: app-workflow-trigger
+    env: go
+    buildCommand: go build start/main.go
+    startCommand: ./main
+    envVars:
+      - key: TEMPORAL_CLUSTER_HOSTPORT
+        fromService:
+          name: temporal-frontend
+          type: web
+          property: hostport
+  - type: worker
+    name: app-worker
+    env: go
+    buildCommand: go build worker/main.go
+    startCommand: ./main
+    envVars:
+      - key: TEMPORAL_CLUSTER_HOSTPORT
+        fromService:
+          name: temporal-frontend
+          type: web
+          property: hostport
