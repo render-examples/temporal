@@ -1,29 +1,22 @@
 # Temporal 
 
-This is a template for running a Temporal cluster on Render. It includes an example Go app that interacts with the cluster. Fork this repo and then click the button below to try it out!
+This is a template for running a production-ready Temporal cluster on Render, that supports independent autoscaling for each Temporal service (frontend, matching, history, worker). The setup also includes an ElasticSearch instance, and an example Go app that can trigger and run workflows. Fork this repo and then click the button below to try it out!
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
 This repo defines a [Render Blueprint](https://render.com/docs/blueprint-spec) with the following components:
 - Temporal cluster:
-  - Two Postgres databases, `temporal-db` and `temporal-db-visibility`.
-  - A `temporal-all` server that runs all Temporal services.
-  - `temporal-ui` provides the Temporal web UI.
+  - A postgres DB.
+  - An ElasticSearch instance, for [advanced visibility](https://docs.temporal.io/docs/content/what-is-advanced-visibility/).
+  - A [private service](https://render.com/docs/private-services) for each Temporal service: frontend, matching, history, and worker.
+  - The Temporal web UI.
 - Example app (based on Temporal's [Go SDK Example](https://github.com/temporalio/money-transfer-project-template-go)):
   - `app-workflow-trigger` runs a simple HTTP server with two routes:
     - `/` for health checking.
     - `/trigger-workflow` for kicking off the `TransferMoney` workflow.
   - `app-worker` executes any triggered workflows.
 
-For a more production-ready setup, use the Blueprint defined in [render.with_scaling.yaml](render.with_scaling.yaml) rather than the one in [render.yaml](render.yaml). The main differences are:
-- Each of the four Temporal services is run as its own Render service that can be scaled independently.
-- Integrates ElasticSearch, to enable Temporal's [advanced visibility](https://docs.temporal.io/docs/content/what-is-advanced-visibility/).
-
-To use this in your fork, run
-```bash
-$ mv render.with_scaling.yaml render.yaml
-```
-and commit the change. You may also wish to tweak the autoscaling parameters, which are currently defined as:
+You may also wish to tweak the autoscaling parameters of the Temporal cluster services, which are currently defined as:
 ```yaml
 scaling:
   minInstances: 2
@@ -95,7 +88,6 @@ scaling:
 6. `app-worker` will immediately pick up and run this workflow. You can verify by clicking on the service, and going to the "Logs" tab:
 ![app-worker-logs](./assets/worker-logs.png)
 7. To check that the workflow has been run successfully, click on the `temporal-web` service, and go to its URL. Under the `default` namespace, you should find your workflow's run with the status "Completed".
-
 
 # Acknowledgements
 

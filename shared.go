@@ -4,7 +4,7 @@ import "os"
 
 const TransferMoneyTaskQueue = "TRANSFER_MONEY_TASK_QUEUE"
 
-var HostPort = os.Getenv("TEMPORAL_CLUSTER_HOSTPORT")
+var HostPort = os.Getenv("TEMPORAL_CLUSTER_HOST") + ":7233"
 
 type TransferDetails struct {
 	Amount      float32
