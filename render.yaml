@@ -4,6 +4,20 @@ databases:
     user: temporal
     plan: standard
 
+envVarGroups:
+  - name: temporal-shared
+    envVars:
+      - key: DYNAMIC_CONFIG_FILE_PATH
+        value: /etc/temporal/dynamicconfig_es.yaml
+      - key: ENABLE_ES
+        value: true
+      - key: ES_VERSION
+        value: v7
+      - key: ES_USER
+        value: elastic
+      - key: DB
+        value: postgresql
+
 services:
   - type: pserv
     name: temporal-elasticsearch
@@ -42,33 +56,23 @@ services:
       targetMemoryPercent: 80
       targetCPUPercent: 80
     envVars:
+      - fromGroup: temporal-shared
       - key: SERVICES
         value: frontend
-      - key: DYNAMIC_CONFIG_FILE_PATH
-        # value: /etc/temporal/dynamicconfig.yaml
-        value: /etc/temporal/dynamicconfig_es.yaml # Use this if deploying with ElasticSearch
-      - key: ENABLE_ES
+      - key: SKIP_POSTGRES_DB_CREATION
         value: true
-      - key: ES_VERSION
-        value: v7
+      - key: SKIP_VISIBILITY_DB_SETUP
+        value: true
       - key: ES_SEEDS
         fromService:
           name: temporal-elasticsearch
           type: pserv
           property: host
-      - key: ES_USER
-        value: elastic
       - key: ES_PWD
         fromService:
           name: temporal-elasticsearch
           type: pserv
           envVarKey: ELASTIC_PASSWORD
-      - key: SKIP_POSTGRES_DB_CREATION
-        value: true
-      - key: SKIP_VISIBILITY_DB_SETUP
-        value: true
-      - key: DB
-        value: postgresql
       - key: DBNAME
         fromDatabase:
           name: temporal-db
@@ -101,6 +105,7 @@ services:
       targetMemoryPercent: 80
       targetCPUPercent: 80
     envVars:
+      - fromGroup: temporal-shared
       - key: SERVICES
         value: history
       - key: TEMPORAL_FRONTEND_HOST
@@ -108,27 +113,16 @@ services:
           name: temporal-frontend
           type: pserv
           property: host
-      - key: DYNAMIC_CONFIG_FILE_PATH
-        # value: /etc/temporal/dynamicconfig.yaml
-        value: /etc/temporal/dynamicconfig_es.yaml # Use this if deploying with ElasticSearch
-      - key: ENABLE_ES
-        value: true
-      - key: ES_VERSION
-        value: v7
       - key: ES_SEEDS
         fromService:
           name: temporal-elasticsearch
           type: pserv
           property: host
-      - key: ES_USER
-        value: elastic
       - key: ES_PWD
         fromService:
           name: temporal-elasticsearch
           type: pserv
           envVarKey: ELASTIC_PASSWORD
-      - key: DB
-        value: postgresql
       - key: DBNAME
         fromDatabase:
           name: temporal-db
@@ -157,6 +151,7 @@ services:
       targetMemoryPercent: 80
       targetCPUPercent: 80
     envVars:
+      - fromGroup: temporal-shared
       - key: SERVICES
         value: matching
       - key: TEMPORAL_FRONTEND_HOST
@@ -164,27 +159,16 @@ services:
           name: temporal-frontend
           type: pserv
           property: host
-      - key: DYNAMIC_CONFIG_FILE_PATH
-        # value: /etc/temporal/dynamicconfig.yaml
-        value: /etc/temporal/dynamicconfig_es.yaml # Use this if deploying with ElasticSearch
-      - key: ENABLE_ES
-        value: true
-      - key: ES_VERSION
-        value: v7
       - key: ES_SEEDS
         fromService:
           name: temporal-elasticsearch
           type: pserv
           property: host
-      - key: ES_USER
-        value: elastic
       - key: ES_PWD
         fromService:
           name: temporal-elasticsearch
           type: pserv
           envVarKey: ELASTIC_PASSWORD
-      - key: DB
-        value: postgresql
       - key: DBNAME
         fromDatabase:
           name: temporal-db
@@ -212,6 +196,7 @@ services:
       targetMemoryPercent: 80
       targetCPUPercent: 80
     envVars:
+      - fromGroup: temporal-shared
       # The worker service needs to wait for the history service to be up first,
       # otherwise it will fail with "error starting scanner".
       - key: DEPENDS_ON_HISTORY
@@ -226,27 +211,16 @@ services:
           name: temporal-frontend
           type: pserv
           property: host
-      - key: DYNAMIC_CONFIG_FILE_PATH
-        # value: /etc/temporal/dynamicconfig.yaml
-        value: /etc/temporal/dynamicconfig_es.yaml # Use this if deploying with ElasticSearch
-      - key: ENABLE_ES
-        value: true
-      - key: ES_VERSION
-        value: v7
       - key: ES_SEEDS
         fromService:
           name: temporal-elasticsearch
           type: pserv
           property: host
-      - key: ES_USER
-        value: elastic
       - key: ES_PWD
         fromService:
           name: temporal-elasticsearch
           type: pserv
           envVarKey: ELASTIC_PASSWORD
-      - key: DB
-        value: postgresql
       - key: DBNAME
         fromDatabase:
           name: temporal-db
