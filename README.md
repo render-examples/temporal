@@ -10,7 +10,7 @@ This repo defines a [Render Blueprint](https://render.com/docs/blueprint-spec) w
   - An Elasticsearch instance.
   - One [private service](https://render.com/docs/private-services) for each Temporal service: frontend, matching, history, and worker.
   - The Temporal web UI.
-- Example app (based on Temporal's [Go SDK Example](https://github.com/temporalio/money-transfer-project-template-go)):
+- Example app from [render-examples/sample-temporal-app](https://github.com/render-examples/sample-temporal-app):
   - `app-workflow-trigger` runs a simple HTTP server with two routes:
     - `/` for health checking.
     - `/trigger-workflow` for kicking off the `TransferMoney` workflow.
