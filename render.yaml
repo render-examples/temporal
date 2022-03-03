@@ -254,6 +254,7 @@ services:
       type: pserv
       property: host
 - type: web
+  repo: https://github.com/render-examples/sample-temporal-app
   name: app-workflow-trigger
   env: go
   buildCommand: go build start/main.go
@@ -265,6 +266,7 @@ services:
       type: pserv
       property: host
 - type: worker
+  repo: https://github.com/render-examples/sample-temporal-app
   name: app-worker
   env: go
   buildCommand: go build worker/main.go
