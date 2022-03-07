@@ -22,7 +22,7 @@ services:
 - type: pserv
   name: temporal-elasticsearch
   autoDeploy: false
-  plan: Standard
+  plan: Starter
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/elasticsearch/Dockerfile
@@ -48,7 +48,7 @@ services:
 - type: pserv
   name: temporal-frontend
   autoDeploy: false
-  plan: Standard
+  plan: Starter
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/server/auto-setup/Dockerfile
@@ -98,7 +98,7 @@ services:
 - type: pserv
   name: temporal-history
   autoDeploy: false
-  plan: Standard
+  plan: Starter
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
@@ -145,7 +145,7 @@ services:
 - type: pserv
   name: temporal-matching
   autoDeploy: false
-  plan: Standard
+  plan: Starter
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
@@ -192,6 +192,7 @@ services:
 - type: pserv
   autoDeploy: false
   name: temporal-worker
+  plan: Starter
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
@@ -245,7 +246,7 @@ services:
 - type: web
   name: temporal-ui
   autoDeploy: false
-  plan: Standard
+  plan: Starter
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/web/Dockerfile
@@ -262,6 +263,7 @@ services:
 - type: web
   repo: https://github.com/render-examples/sample-temporal-app
   name: app-workflow-trigger
+  plan: Starter
   region: oregon
   env: go
   buildCommand: go build start/main.go
@@ -275,6 +277,7 @@ services:
 - type: worker
   repo: https://github.com/render-examples/sample-temporal-app
   name: app-worker
+  plan: Starter
   region: oregon
   env: go
   buildCommand: go build worker/main.go
