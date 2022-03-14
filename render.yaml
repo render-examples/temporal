@@ -2,7 +2,8 @@ databases:
 - name: temporal-db
   databaseName: temporal
   user: temporal
-  plan: standard
+  plan: Starter
+  region: oregon
 
 envVarGroups:
   - name: temporal-shared
