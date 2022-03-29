@@ -261,6 +261,25 @@ services:
       name: temporal-frontend
       type: pserv
       property: host
+# For secure external access to the Temporal Workflow Service via REST
+# See https://github.com/render-examples/temporal-rest-proxy
+# - type: web
+#   name: rest-to-grpc-proxy
+#   repo: https://github.com/render-examples/temporal-rest-proxy
+#   autoDeploy: false
+#   plan: Starter
+#   region: oregon
+#   env: go
+#   buildCommand: go build rest-proxy/main.go
+#   startCommand: ./main
+#   envVars:
+#   - key: TEMPORAL_CLUSTER_HOST
+#     fromService:
+#       name: temporal-frontend
+#       type: pserv
+#       property: host
+#   - key: AUTH_TOKEN
+#     sync: false
 - type: web
   repo: https://github.com/render-examples/sample-temporal-app
   name: app-workflow-trigger
