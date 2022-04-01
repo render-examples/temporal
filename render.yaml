@@ -27,6 +27,10 @@ services:
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/elasticsearch/Dockerfile
+  disk:
+    name: esdata
+    mountPath: /usr/share/elasticsearch/data
+    sizeGB: 10
   envVars:
   - key: PORT
     value: 9200
