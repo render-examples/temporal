@@ -27,7 +27,6 @@ services:
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/elasticsearch/Dockerfile
-  autoDeploy: false
   disk:
     name: esdata
     mountPath: /usr/share/elasticsearch/data
@@ -58,7 +57,6 @@ services:
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/server/auto-setup/Dockerfile
-  autoDeploy: false
   scaling:
     minInstances: 1
     maxInstances: 3
@@ -109,7 +107,6 @@ services:
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
-  autoDeploy: false
   scaling:
     minInstances: 1
     maxInstances: 3
@@ -157,7 +154,6 @@ services:
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
-  autoDeploy: false
   scaling:
     minInstances: 1
     maxInstances: 3
@@ -205,7 +201,6 @@ services:
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
-  autoDeploy: false
   scaling:
     minInstances: 1
     maxInstances: 3
@@ -260,7 +255,6 @@ services:
   region: oregon
   env: docker
   dockerfilePath: ./temporal-cluster/web/Dockerfile
-  autoDeploy: false
   envVars:
   - key: PORT
     value: 8088
