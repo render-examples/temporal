@@ -2,7 +2,8 @@ databases:
 - name: temporal-db
   databaseName: temporal
   user: temporal
-  plan: Starter
+  plan: basic-256mb
+  diskSizeGB: 1
   region: oregon
 
 envVarGroups:
