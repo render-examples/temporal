@@ -41,17 +41,6 @@ VISIBILITY_DBNAME="${VISIBILITY_DBNAME:-$DBNAME}"
 # Don't create the DB instance
 SKIP_POSTGRES_DB_CREATION="${SKIP_POSTGRES_DB_CREATION:-false}"
 
-# Elasticsearch
-ENABLE_ES="${ENABLE_ES:-false}"
-ES_SCHEME="${ES_SCHEME:-http}"
-ES_SEEDS="${ES_SEEDS:-}"
-ES_PORT="${ES_PORT:-9200}"
-ES_USER="${ES_USER:-}"
-ES_PWD="${ES_PWD:-}"
-ES_VERSION="${ES_VERSION:-v7}"
-ES_VIS_INDEX="${ES_VIS_INDEX:-temporal_visibility_v1_dev}"
-ES_SCHEMA_SETUP_TIMEOUT_IN_SECONDS="${ES_SCHEMA_SETUP_TIMEOUT_IN_SECONDS:-0}"
-
 # Render-specific Server setup
 TEMPORAL_CLI_ADDRESS="$RENDER_SERVICE_NAME:${FRONTEND_GRPC_PORT:-7233}"
 
@@ -180,7 +169,7 @@ setup_postgres_schema() {
     # TODO (alex): Remove exports
     { export SQL_PASSWORD=${POSTGRES_PWD}; } 2> /dev/null
 
-    SCHEMA_DIR=${TEMPORAL_HOME}/schema/postgresql/v96/temporal/versioned
+    SCHEMA_DIR=${TEMPORAL_HOME}/schema/postgresql/v12/temporal/versioned
     # Create database only if its name is different from the user name. Otherwise PostgreSQL container itself will create database.
     if [[ "${DBNAME}" != "${POSTGRES_USER}" && "${SKIP_POSTGRES_DB_CREATION}" != true ]]; then
         temporal-sql-tool --plugin postgres12 --ep "${POSTGRES_SEEDS}" -u "${POSTGRES_USER}" -p "${DB_PORT}" create --db "${DBNAME}"
@@ -190,7 +179,7 @@ setup_postgres_schema() {
 
     if [[ "${SKIP_VISIBILITY_DB_SETUP}" != true ]]; then
         { export SQL_PASSWORD=${VISIBILITY_POSTGRES_PWD}; } 2> /dev/null
-        VISIBILITY_SCHEMA_DIR=${TEMPORAL_HOME}/schema/postgresql/v96/visibility/versioned
+        VISIBILITY_SCHEMA_DIR=${TEMPORAL_HOME}/schema/postgresql/v12/visibility/versioned
         if [[ "${VISIBILITY_DBNAME}" != "${POSTGRES_USER}" && "${SKIP_POSTGRES_DB_CREATION}" != true ]]; then
             temporal-sql-tool --plugin postgres12 --ep "${VISIBILITY_POSTGRES_SEEDS}" -u "${VISIBILITY_POSTGRES_USER}" -p "${VISIBILITY_DB_PORT}" create --db "${VISIBILITY_DBNAME}"
         fi
@@ -210,52 +199,6 @@ setup_schema() {
         echo 'Setup Cassandra schema.'
         setup_cassandra_schema
     fi
-}
-
-# === Elasticsearch functions ===
-
-validate_es_env() {
-    if [ "${ENABLE_ES}" == true ]; then
-        if [ -z "${ES_SEEDS}" ]; then
-            echo "ES_SEEDS env must be set if ENABLE_ES is ${ENABLE_ES}"
-            exit 1
-        fi
-    fi
-}
-
-wait_for_es() {
-    SECONDS=0
-
-    ES_SERVER="${ES_SCHEME}://${ES_SEEDS%%,*}:${ES_PORT}"
-
-    until curl --silent --fail --user "${ES_USER}":"${ES_PWD}" "${ES_SERVER}" > /dev/null 2>&1; do
-        DURATION=${SECONDS}
-
-        if [ "${ES_SCHEMA_SETUP_TIMEOUT_IN_SECONDS}" -gt 0 ] && [ ${DURATION} -ge "${ES_SCHEMA_SETUP_TIMEOUT_IN_SECONDS}" ]; then
-            echo 'WARNING: timed out waiting for Elasticsearch to start up. Skipping index creation.'
-            return;
-        fi
-
-        echo 'Waiting for Elasticsearch to start up.'
-        sleep 1
-    done
-
-    echo 'Elasticsearch started.'
-}
-
-setup_es_index() {
-    ES_SERVER="${ES_SCHEME}://${ES_SEEDS%%,*}:${ES_PORT}"
-# @@@SNIPSTART setup-es-template-commands
-    # ES_SERVER is the URL of Elasticsearch server i.e. "http://localhost:9200".
-    SETTINGS_URL="${ES_SERVER}/_cluster/settings"
-    SETTINGS_FILE=${TEMPORAL_HOME}/schema/elasticsearch/visibility/cluster_settings_${ES_VERSION}.json
-    TEMPLATE_URL="${ES_SERVER}/_template/temporal_visibility_v1_template"
-    SCHEMA_FILE=${TEMPORAL_HOME}/schema/elasticsearch/visibility/index_template_${ES_VERSION}.json
-    INDEX_URL="${ES_SERVER}/${ES_VIS_INDEX}"
-    curl --fail --user "${ES_USER}":"${ES_PWD}" -X PUT "${SETTINGS_URL}" -H "Content-Type: application/json" --data-binary "@${SETTINGS_FILE}" --write-out "\n"
-    curl --fail --user "${ES_USER}":"${ES_PWD}" -X PUT "${TEMPLATE_URL}" -H 'Content-Type: application/json' --data-binary "@${SCHEMA_FILE}" --write-out "\n"
-    curl --user "${ES_USER}":"${ES_PWD}" -X PUT "${INDEX_URL}" --write-out "\n"
-# @@@SNIPEND
 }
 
 # === Server setup ===
@@ -310,12 +253,6 @@ if [ "${SKIP_SCHEMA_SETUP}" != true ]; then
     validate_db_env
     wait_for_db
     setup_schema
-fi
-
-if [ "${ENABLE_ES}" == true ]; then
-    validate_es_env
-    wait_for_es
-    setup_es_index
 fi
 
 # Run this func in parallel process. It will wait for server to start and then run required steps.

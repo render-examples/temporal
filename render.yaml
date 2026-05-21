@@ -17,7 +17,7 @@ envVarGroups:
 services:
 - type: pserv
   name: temporal-frontend
-  autoDeploy: false
+  autoDeployTrigger: "off"
   plan: starter
   region: oregon
   runtime: docker
@@ -55,7 +55,7 @@ services:
       property: host
 - type: pserv
   name: temporal-history
-  autoDeploy: false
+  autoDeployTrigger: "off"
   plan: starter
   region: oregon
   runtime: docker
@@ -92,7 +92,7 @@ services:
       property: host
 - type: pserv
   name: temporal-matching
-  autoDeploy: false
+  autoDeployTrigger: "off"
   plan: starter
   region: oregon
   runtime: docker
@@ -128,7 +128,7 @@ services:
       name: temporal-db
       property: host
 - type: pserv
-  autoDeploy: false
+  autoDeployTrigger: "off"
   name: temporal-worker
   plan: starter
   region: oregon
@@ -173,7 +173,7 @@ services:
       property: host
 - type: pserv
   name: temporal-ui
-  autoDeploy: false
+  autoDeployTrigger: "off"
   plan: starter
   region: oregon
   runtime: docker
@@ -192,7 +192,7 @@ services:
 # - type: web
 #   name: rest-to-grpc-proxy
 #   repo: https://github.com/render-examples/temporal-rest-proxy
-#   autoDeploy: false
+#   autoDeployTrigger: "off"
 #   plan: starter
 #   region: oregon
 #   runtime: go
@@ -214,7 +214,7 @@ services:
   runtime: go
   buildCommand: go build start/main.go
   startCommand: ./main
-  autoDeploy: false
+  autoDeployTrigger: "off"
   envVars:
   - key: TEMPORAL_CLUSTER_HOST
     fromService:
@@ -229,7 +229,7 @@ services:
   runtime: go
   buildCommand: go build worker/main.go
   startCommand: ./main
-  autoDeploy: false
+  autoDeployTrigger: "off"
   envVars:
   - key: TEMPORAL_CLUSTER_HOST
     fromService:

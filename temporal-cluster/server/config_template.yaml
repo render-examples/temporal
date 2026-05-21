@@ -6,10 +6,6 @@ persistence:
     numHistoryShards: {{ default .Env.NUM_HISTORY_SHARDS "4" }}
     defaultStore: default
     visibilityStore: visibility
-    {{- $es := default .Env.ENABLE_ES "false" | lower -}}
-    {{- if eq $es "true" }}
-    advancedVisibilityStore: es-visibility
-    {{- end }}
     datastores:
         {{- $db := default .Env.DB "cassandra" | lower -}}
         {{- if eq $db "cassandra" }}
@@ -155,18 +151,6 @@ persistence:
                     keyFile: {{ default .Env.SQL_CERT_KEY "" }}
                     enableHostVerification: {{ default .Env.SQL_HOST_VERIFICATION "false" }}
                     serverName: {{ default .Env.SQL_HOST_NAME "" }}
-        {{- end }}
-        {{- if eq $es "true" }}
-        es-visibility:
-            elasticsearch:
-                version: {{ default .Env.ES_VERSION "" }}
-                url:
-                    scheme: {{ default .Env.ES_SCHEME "http" }}
-                    host: "{{ default .Env.ES_SEEDS "" }}:{{ default .Env.ES_PORT "9200" }}"
-                username: "{{ default .Env.ES_USER "" }}"
-                password: "{{ default .Env.ES_PWD "" }}"
-                indices:
-                    visibility: "{{ default .Env.ES_VIS_INDEX "temporal_visibility_v1_dev" }}"
         {{- end }}
 
 global:

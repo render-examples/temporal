@@ -1,8 +1,10 @@
 # Temporal 
 
-This is a template for running a production-ready Temporal cluster on Render. The setup supports independent autoscaling for each Temporal service (frontend, matching, history, worker), uses PostgreSQL-backed visibility to keep the topology simple, and includes an example Go app to trigger and run workflows. Create a new repo using this template, and then click the button below to try it out:
+This is a template for running a production-ready Temporal cluster on Render. The setup supports independent autoscaling for each Temporal service (frontend, matching, history, worker), uses PostgreSQL-backed visibility (no Elasticsearch service), and includes an example Go app to trigger and run workflows. Create a new repo using this template, and then click the button below to try it out:
 
 By default, visibility data uses the same PostgreSQL database as core Temporal persistence (`VISIBILITY_DBNAME` defaults to `DBNAME`). If you want to split visibility into a dedicated database, set `VISIBILITY_DBNAME` (and optionally `VISIBILITY_POSTGRES_*`) on the Temporal services.
+
+This template is pinned to Temporal `1.29.x`; upgrading to `1.30+` requires additional setup script and config-template migration work.
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/render-examples/temporal)
 
