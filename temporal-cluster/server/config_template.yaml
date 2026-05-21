@@ -74,7 +74,7 @@ persistence:
                 maxConnLifetime: {{ default .Env.SQL_MAX_CONN_TIME "1h" }}
                 tls:
                     enabled: {{ default .Env.SQL_TLS_ENABLED "false" }}
-                    сaFile: {{ default .Env.SQL_CA "" }}
+                    caFile: {{ default .Env.SQL_CA "" }}
                     certFile: {{ default .Env.SQL_CERT "" }}
                     keyFile: {{ default .Env.SQL_CERT_KEY "" }}
                     enableHostVerification: {{ default .Env.SQL_HOST_VERIFICATION "false" }}
@@ -104,7 +104,7 @@ persistence:
                 maxConnLifetime: {{ default .Env.SQL_VIS_MAX_CONN_TIME "1h" }}
                 tls:
                     enabled: {{ default .Env.SQL_TLS_ENABLED "false" }}
-                    сaFile: {{ default .Env.SQL_CA "" }}
+                    caFile: {{ default .Env.SQL_CA "" }}
                     certFile: {{ default .Env.SQL_CERT "" }}
                     keyFile: {{ default .Env.SQL_CERT_KEY "" }}
                     enableHostVerification: {{ default .Env.SQL_HOST_VERIFICATION "false" }}
@@ -123,12 +123,29 @@ persistence:
                 maxConnLifetime: {{ default .Env.SQL_MAX_CONN_TIME "1h" }}
                 tls:
                     enabled: {{ default .Env.SQL_TLS_ENABLED "false" }}
-                    сaFile: {{ default .Env.SQL_CA "" }}
+                    caFile: {{ default .Env.SQL_CA "" }}
                     certFile: {{ default .Env.SQL_CERT "" }}
                     keyFile: {{ default .Env.SQL_CERT_KEY "" }}
                     enableHostVerification: {{ default .Env.SQL_HOST_VERIFICATION "false" }}
                     serverName: {{ default .Env.SQL_HOST_NAME "" }}
-            visibility:
+        visibility:
+            sql:
+                pluginName: "postgres"
+                databaseName: "{{ default .Env.VISIBILITY_DBNAME .Env.DBNAME }}"
+                connectAddr: "{{ default .Env.VISIBILITY_POSTGRES_SEEDS .Env.POSTGRES_SEEDS }}:{{ default .Env.VISIBILITY_DB_PORT .Env.DB_PORT }}"
+                connectProtocol: "tcp"
+                user: "{{ default .Env.VISIBILITY_POSTGRES_USER .Env.POSTGRES_USER }}"
+                password: "{{ default .Env.VISIBILITY_POSTGRES_PWD .Env.POSTGRES_PWD }}"
+                maxConns: {{ default .Env.SQL_VIS_MAX_CONNS "10" }}
+                maxIdleConns: {{ default .Env.SQL_VIS_MAX_IDLE_CONNS "10" }}
+                maxConnLifetime: {{ default .Env.SQL_VIS_MAX_CONN_TIME "1h" }}
+                tls:
+                    enabled: {{ default .Env.SQL_TLS_ENABLED "false" }}
+                    caFile: {{ default .Env.SQL_CA "" }}
+                    certFile: {{ default .Env.SQL_CERT "" }}
+                    keyFile: {{ default .Env.SQL_CERT_KEY "" }}
+                    enableHostVerification: {{ default .Env.SQL_HOST_VERIFICATION "false" }}
+                    serverName: {{ default .Env.SQL_HOST_NAME "" }}
         {{- end }}
         {{- if eq $es "true" }}
         es-visibility:

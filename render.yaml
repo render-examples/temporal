@@ -10,47 +10,11 @@ envVarGroups:
   - name: temporal-shared
     envVars:
     - key: DYNAMIC_CONFIG_FILE_PATH
-      value: /etc/temporal/dynamicconfig_es.yaml
-    - key: ENABLE_ES
-      value: true
-    - key: ES_VERSION
-      value: v7
-    - key: ES_USER
-      value: elastic
+      value: /etc/temporal/dynamicconfig.yaml
     - key: DB
       value: postgresql
 
 services:
-- type: pserv
-  name: temporal-elasticsearch
-  autoDeploy: false
-  plan: Starter
-  region: oregon
-  env: docker
-  dockerfilePath: ./temporal-cluster/elasticsearch/Dockerfile
-  disk:
-    name: esdata
-    mountPath: /usr/share/elasticsearch/data
-    sizeGB: 10
-  envVars:
-  - key: PORT
-    value: 9200
-  - key: ES_JAVA_OPTS
-    value: "-Xms100m -Xmx100m"
-  - key: xpack.security.enabled
-    value: true
-  - key: ELASTIC_PASSWORD
-    generateValue: true
-  - key: cluster.routing.allocation.disk.threshold_enabled
-    value: true
-  - key: cluster.routing.allocation.disk.watermark.low
-    value: 512mb
-  - key: cluster.routing.allocation.disk.watermark.high
-    value: 256mb
-  - key: cluster.routing.allocation.disk.watermark.flood_stage
-    value: 128mb
-  - key: discovery.type
-    value: single-node
 - type: pserv
   name: temporal-frontend
   autoDeploy: false
@@ -69,18 +33,6 @@ services:
     value: frontend
   - key: SKIP_POSTGRES_DB_CREATION
     value: true
-  - key: SKIP_VISIBILITY_DB_SETUP
-    value: true
-  - key: ES_SEEDS
-    fromService:
-      name: temporal-elasticsearch
-      type: pserv
-      property: host
-  - key: ES_PWD
-    fromService:
-      name: temporal-elasticsearch
-      type: pserv
-      envVarKey: ELASTIC_PASSWORD
   - key: DBNAME
     fromDatabase:
       name: temporal-db
@@ -122,16 +74,6 @@ services:
       name: temporal-frontend
       type: pserv
       property: host
-  - key: ES_SEEDS
-    fromService:
-      name: temporal-elasticsearch
-      type: pserv
-      property: host
-  - key: ES_PWD
-    fromService:
-      name: temporal-elasticsearch
-      type: pserv
-      envVarKey: ELASTIC_PASSWORD
   - key: DBNAME
     fromDatabase:
       name: temporal-db
@@ -169,16 +111,6 @@ services:
       name: temporal-frontend
       type: pserv
       property: host
-  - key: ES_SEEDS
-    fromService:
-      name: temporal-elasticsearch
-      type: pserv
-      property: host
-  - key: ES_PWD
-    fromService:
-      name: temporal-elasticsearch
-      type: pserv
-      envVarKey: ELASTIC_PASSWORD
   - key: DBNAME
     fromDatabase:
       name: temporal-db
@@ -223,16 +155,6 @@ services:
       name: temporal-frontend
       type: pserv
       property: host
-  - key: ES_SEEDS
-    fromService:
-      name: temporal-elasticsearch
-      type: pserv
-      property: host
-  - key: ES_PWD
-    fromService:
-      name: temporal-elasticsearch
-      type: pserv
-      envVarKey: ELASTIC_PASSWORD
   - key: DBNAME
     fromDatabase:
       name: temporal-db
@@ -261,11 +183,8 @@ services:
     value: 8088
   - key: TEMPORAL_PERMIT_WRITE_API
     value: true
-  - key: TEMPORAL_GRPC_HOST
-    fromService:
-      name: temporal-frontend
-      type: pserv
-      property: host
+  - key: TEMPORAL_ADDRESS
+    value: temporal-frontend:7233
 # For secure external access to the Temporal Workflow Service via REST
 # See https://github.com/render-examples/temporal-rest-proxy
 # - type: web
