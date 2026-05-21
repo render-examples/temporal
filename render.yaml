@@ -18,9 +18,9 @@ services:
 - type: pserv
   name: temporal-frontend
   autoDeploy: false
-  plan: Starter
+  plan: starter
   region: oregon
-  env: docker
+  runtime: docker
   dockerfilePath: ./temporal-cluster/server/auto-setup/Dockerfile
   scaling:
     minInstances: 1
@@ -32,7 +32,7 @@ services:
   - key: SERVICES
     value: frontend
   - key: SKIP_POSTGRES_DB_CREATION
-    value: true
+    value: "true"
   - key: DBNAME
     fromDatabase:
       name: temporal-db
@@ -56,9 +56,9 @@ services:
 - type: pserv
   name: temporal-history
   autoDeploy: false
-  plan: Starter
+  plan: starter
   region: oregon
-  env: docker
+  runtime: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
   scaling:
     minInstances: 1
@@ -93,9 +93,9 @@ services:
 - type: pserv
   name: temporal-matching
   autoDeploy: false
-  plan: Starter
+  plan: starter
   region: oregon
-  env: docker
+  runtime: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
   scaling:
     minInstances: 1
@@ -130,9 +130,9 @@ services:
 - type: pserv
   autoDeploy: false
   name: temporal-worker
-  plan: Starter
+  plan: starter
   region: oregon
-  env: docker
+  runtime: docker
   dockerfilePath: ./temporal-cluster/server/Dockerfile
   scaling:
     minInstances: 1
@@ -174,15 +174,15 @@ services:
 - type: pserv
   name: temporal-ui
   autoDeploy: false
-  plan: Starter
+  plan: starter
   region: oregon
-  env: docker
+  runtime: docker
   dockerfilePath: ./temporal-cluster/web/Dockerfile
   envVars:
   - key: PORT
     value: 8088
   - key: TEMPORAL_PERMIT_WRITE_API
-    value: true
+    value: "true"
   - key: TEMPORAL_ADDRESS
     value: temporal-frontend:7233
 # For secure external access to the Temporal Workflow Service via REST
@@ -191,9 +191,9 @@ services:
 #   name: rest-to-grpc-proxy
 #   repo: https://github.com/render-examples/temporal-rest-proxy
 #   autoDeploy: false
-#   plan: Starter
+#   plan: starter
 #   region: oregon
-#   env: go
+#   runtime: go
 #   buildCommand: go build rest-proxy/main.go
 #   startCommand: ./main
 #   envVars:
@@ -207,9 +207,9 @@ services:
 - type: web
   repo: https://github.com/render-examples/sample-temporal-app
   name: app-workflow-trigger
-  plan: Starter
+  plan: starter
   region: oregon
-  env: go
+  runtime: go
   buildCommand: go build start/main.go
   startCommand: ./main
   autoDeploy: false
@@ -222,9 +222,9 @@ services:
 - type: worker
   repo: https://github.com/render-examples/sample-temporal-app
   name: app-worker
-  plan: Starter
+  plan: starter
   region: oregon
-  env: go
+  runtime: go
   buildCommand: go build worker/main.go
   startCommand: ./main
   autoDeploy: false

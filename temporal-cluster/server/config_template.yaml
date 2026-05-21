@@ -112,7 +112,7 @@ persistence:
         {{- else if eq $db "postgresql" }}
         default:
             sql:
-                pluginName: "postgres"
+                pluginName: "postgres12"
                 databaseName: "{{ default .Env.DBNAME "temporal" }}"
                 connectAddr: "{{ default .Env.POSTGRES_SEEDS "" }}:{{ default .Env.DB_PORT "5432" }}"
                 connectProtocol: "tcp"
@@ -130,7 +130,7 @@ persistence:
                     serverName: {{ default .Env.SQL_HOST_NAME "" }}
         visibility:
             sql:
-                pluginName: "postgres"
+                pluginName: "postgres12"
                 databaseName: "{{ default .Env.VISIBILITY_DBNAME .Env.DBNAME }}"
                 connectAddr: "{{ default .Env.VISIBILITY_POSTGRES_SEEDS .Env.POSTGRES_SEEDS }}:{{ default .Env.VISIBILITY_DB_PORT .Env.DB_PORT }}"
                 connectProtocol: "tcp"
